@@ -12,14 +12,21 @@ export class Task implements ITask {
   public dueTime: number;
 
   constructor(payload?: unknown) {
-    const description = get(payload, 'description', '');
-    const id = description !== '' ? get(payload, 'id', 0) : 0;
+    const description: string = get(payload, 'description', '');
+    const id: number = description !== '' ? get(payload, 'id', 0) : 0;
+    const isCompleted: boolean = get(payload, 'isCompleted', false);
+    const dueTime: number = get(payload, 'dueTime', 0);
     this.id = id;
     this.description = description;
-    this.isCompleted = get(payload, 'isCompleted', false);
-    this._changeEvent$ = new BehaviorSubject<TaskContent | null>(null);
+    this.isCompleted = isCompleted;
+    const content: TaskContent = {
+      description,
+      isCompleted,
+      dueTime,
+    };
+    this._changeEvent$ = new BehaviorSubject<TaskContent | null>(content);
     this.changeEvent$ = this._changeEvent$.asObservable();
-    this.dueTime = get(payload, 'dueTime', 0);
+    this.dueTime = dueTime;
   }
   public modify(payload: TaskOptionalContent): void {
     if (has(payload, 'description')) this.description = get(payload, 'description', '');

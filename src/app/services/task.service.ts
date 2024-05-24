@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ITaskService } from '../interfaces/ITaskService';
-import { BehaviorSubject, Observable, Subscriber } from 'rxjs';
+import { BehaviorSubject, Observable, Subscriber, timer } from 'rxjs';
 import { ITask } from '../interfaces/ITask';
 import { TaskContent, TaskOptionalContent } from '../types/Task';
 import { Task } from '../classes/Task';
@@ -13,11 +13,18 @@ export class TaskService implements ITaskService {
   private list: Array<ITask>;
   private _changeEvent$: BehaviorSubject<Array<ITask>>;
   public changeEvent$: Observable<Array<ITask>>;
+  private _timer$: BehaviorSubject<number>;
+  public timer$: Observable<number>;
 
   constructor() {
     this.list = [];
     this._changeEvent$ = new BehaviorSubject<Array<ITask>>([]);
     this.changeEvent$ = this._changeEvent$.asObservable();
+    this._timer$ = new BehaviorSubject<number>(new Date().getTime());
+    this.timer$ = this._timer$.asObservable();
+    timer(0, 5000).subscribe(() => {
+      this._timer$.next(new Date().getTime());
+    });
   }
   public get(id: number): Observable<ITask | undefined> {
     return new Observable((subscriber: Subscriber<ITask | undefined>) => {
